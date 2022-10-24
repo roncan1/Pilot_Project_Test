@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/tv_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="전체 용량"
+        android:textSize="40dp"/>
+
+    <TextView
+        android:id="@+id/tv_used"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사용중인 용량"
+        android:textSize="40dp"/>
+
+    <TextView
+        android:id="@+id/tv_available"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사용중인 용량"
+        android:textSize="40dp"/>
+
+    <Button
+        android:id="@+id/btn_go_to_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+</LinearLayout>
