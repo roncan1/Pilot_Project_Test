@@ -27,7 +27,7 @@ public class MediaInfoActivity extends AppCompatActivity {
         TextView tv_video = findViewById(R.id.tv_video);
         TextView tv_audio = findViewById(R.id.tv_audio);
 
-        tv_img.setText(String.valueOf(imgStUsedMemory));
+        tv_img.setText(getFileSize(imgStUsedMemory));
     }
 
     public String getFileSize(long size) {
