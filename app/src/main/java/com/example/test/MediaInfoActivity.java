@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 public class MediaInfoActivity extends AppCompatActivity {
 
     long imgStUsedMemory, exStAllMemory;
+    static int imgCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,7 @@ public class MediaInfoActivity extends AppCompatActivity {
         TextView tv_video = findViewById(R.id.tv_video);
         TextView tv_audio = findViewById(R.id.tv_audio);
 
-        tv_img.setText(getFileSize(imgStUsedMemory));
+        tv_img.setText(getFileSize(imgStUsedMemory) + " / 개수 : " + imgCount);
     }
 
     public String getFileSize(long size) {
@@ -62,6 +63,7 @@ public class MediaInfoActivity extends AppCompatActivity {
             if (files[i].isFile()) {
                 Log.d("파일 or 폴더", "파일, 경로 : " + files[i].getPath());
                 length += files[i].length();
+                imgCount++;
             } else {
                 Log.d("파일 or 폴더", "파일, 경로 : " + files[i].getPath());
                 length += getFolderSize(files[i]);
