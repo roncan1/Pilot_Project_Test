@@ -22,7 +22,7 @@ public class MediaInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_media_info);
 
         checkExternalStorageAllMemory();
-        checkExternalUsedMemory();
+        checkExternalUsedMemory2();
 
         TextView tv_img = findViewById(R.id.tv_img);
         TextView tv_video = findViewById(R.id.tv_video);
@@ -48,6 +48,23 @@ public class MediaInfoActivity extends AppCompatActivity {
             File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             Log.d("파일경로", folder.getPath());
             long bytes = getFolderSize(folder);
+
+            imgStUsedMemory = bytes;
+        }
+    }
+
+    private void checkExternalUsedMemory2() {
+        if(isExternalMemoryAvailable()){
+
+            File[] folder = new File[] {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                };
+
+            long bytes = 0;
+            for (int i = 0; i < folder.length; i++) {
+                bytes += getFolderSize(folder[i]);
+            }
 
             imgStUsedMemory = bytes;
         }

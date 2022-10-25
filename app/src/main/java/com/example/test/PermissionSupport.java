@@ -20,12 +20,8 @@ public class PermissionSupport {
     // Manifset에 권한을 작성 후
     // 요청할 권한을 배열로 저장
     private String[] permissions = {
-            Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.SYSTEM_ALERT_WINDOW,
-
-
     };
 
     // 권한 요청을 할 때 발생하는 창에 대한 결과값
