@@ -3,7 +3,9 @@ package com.example.test;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -22,6 +24,7 @@ public class PermissionSupport {
     private String[] permissions = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.QUERY_ALL_PACKAGES
     };
 
     // 권한 요청을 할 때 발생하는 창에 대한 결과값
