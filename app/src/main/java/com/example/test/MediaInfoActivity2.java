@@ -1,9 +1,15 @@
 package com.example.test;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AppOpsManager;
 import android.app.usage.StorageStats;
 import android.app.usage.StorageStatsManager;
@@ -38,17 +44,33 @@ public class MediaInfoActivity2 extends AppCompatActivity {
 
     long all, image, audio, video, apps;
 
+    ActivityResultLauncher<Intent> startActivityResult;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_info2);
+        setPermissionCallBack();
+        init();
+    }
 
+    void setPermissionCallBack() {
+        startActivityResult = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        Log.d("콜백", "onActivityResult: ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ");
+                        init();
+                    }
+                });
+    }
+
+    void init() {
         // 앱 용량 확인에 필요한 권한 취득
-        int a = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.PACKAGE_USAGE_STATS);
         if (needPermissionForBlocking(getApplicationContext())) {
-
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            startActivity(intent);
+            startActivityResult.launch(intent);
         } else {
             all = getIntent().getLongExtra("all", 0);
 
@@ -68,10 +90,7 @@ public class MediaInfoActivity2 extends AppCompatActivity {
             int appsPercent = (int) ((double) apps / (double) all * 100);
             tv_percent.setText("이미지 : " + imagePercent + "% / " + "앱 : " + appsPercent + "%");
         }
-
     }
-
-
 
     private long getAllImageSizeByByte() {
         // 어플 용량
