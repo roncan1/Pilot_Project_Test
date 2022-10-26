@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MediaInfoActivity2.class);
+                intent.putExtra("all", exStAllMemory);
                 startActivity(intent);
             }
         });
