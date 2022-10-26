@@ -32,7 +32,6 @@ import java.util.UUID;
 
 public class MediaInfoActivity2 extends AppCompatActivity {
 
-    ImageView iv;
     int imgCount = 0, appCount = 0;
 
     long all, image, audio, video, apps;
@@ -53,9 +52,20 @@ public class MediaInfoActivity2 extends AppCompatActivity {
 
         TextView tv_img = findViewById(R.id.tv_img2);
         TextView tv_app = findViewById(R.id.tv_app2);
-        iv = findViewById(R.id.iv_1);
         tv_img.setText(unitConversion(getAllImageSizeByByte()) + " / " + imgCount + "개");
         tv_app.setText(unitConversion(test2()) + " / " + appCount + "개");
+
+        apps = test2();
+
+
+        // 퍼센트 확인 테스트
+        TextView tv_percent = findViewById(R.id.tv_percent);
+        Log.d("TAG", "onCreate: " + image);
+        Log.d("TAG", "onCreate: " + all);
+        int imagePercent = (int) ((double) image / (double) all * 100);
+        int appsPercent = (int) ((double) apps / (double) all * 100);
+        tv_percent.setText("이미지 : " + imagePercent + "% / " + "앱 : " + appsPercent + "%");
+
 
 
     }
@@ -93,6 +103,9 @@ public class MediaInfoActivity2 extends AppCompatActivity {
             bytes += size;
             imgCount++;
         }
+
+        // 퍼센트 확인을 위한 임시코드
+        image = bytes;
 
         // 모든 이미지의 크기가 더해진 byte 값을 리턴
         return bytes;

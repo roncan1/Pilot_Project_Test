@@ -34,10 +34,12 @@
         android:layout_height="wrap_content"
         android:text="앱"
         android:textSize="40dp"/>
-    <ImageView
-        android:id="@+id/iv_1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <TextView
+        android:id="@+id/tv_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="백분율"
+        android:textSize="40dp"
         />
 
 </LinearLayout>
