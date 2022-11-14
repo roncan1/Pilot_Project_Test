@@ -8,31 +8,48 @@
     android:orientation="vertical">
 
 
-    <TextView
-        android:id="@+id/tv_all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="전체 용량"
-        android:textSize="40dp"/>
-
-    <TextView
-        android:id="@+id/tv_used"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="사용중인 용량"
-        android:textSize="40dp"/>
-
-    <TextView
-        android:id="@+id/tv_available"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="사용중인 용량"
-        android:textSize="40dp"/>
+    <Button
+        android:id="@+id/btn_no_url"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="20dp"
+        android:text="url 없는"
+        />
 
     <Button
-        android:id="@+id/btn_go_to_2"
+        android:id="@+id/btn_yes_url"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
+        android:layout_margin="20dp"
+        android:text="url 있는"
         />
+
+<!--    <TextView-->
+<!--        android:id="@+id/tv_title"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="타이틀 : "-->
+<!--        android:textSize="40dp"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tv_text"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="내용1 : "-->
+<!--        android:textSize="40dp"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tv_text_sub"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="내용2 : "-->
+<!--        android:textSize="40dp"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tv_time"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="수신 시간"-->
+<!--        android:textSize="40dp"/>-->
 
 </LinearLayout>

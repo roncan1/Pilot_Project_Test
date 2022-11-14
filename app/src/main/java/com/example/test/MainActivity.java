@@ -1,14 +1,20 @@
 package com.example.test;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,115 +22,116 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+    static Context context;
 
-    // 전체 저장소 용량 확인 테스트
-
-    long exStAllMemory, exStAvailableMemory, exStUsedMemory;
-
-    private PermissionSupport permission;
+    Button btn_yes_url, btn_no_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = MainActivity.this;
 
-        permissionCheck();
+        // 푸시알림 채널 생성
+        createNotificationChannel("TEST", "default channel", NotificationManager.IMPORTANCE_HIGH);
 
-        checkExternalStorageAllMemory();
-        checkExternalAvailableMemory();
-        checkExternalUsedMemory(exStAllMemory);
+        // 권한 체크 및 요청
+        if (!permissionGrantred()) {
+            Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+            startActivity(intent);
+        }
 
-        TextView tv_all = findViewById(R.id.tv_all);
-        TextView tv_used = findViewById(R.id.tv_used);
-        TextView tv_available = findViewById(R.id.tv_available);
+        String url = "https://gist.githubusercontent.com/mrw0119/716f47bce7dac74doubt57c1747757f03b45b/raw/073dd8a69a3cb1bacd644a4d174160f3fa1ba3e3/android_clickable_notification.java";
 
-        tv_all.setText("전체 " + getFileSize(exStAllMemory));
-        tv_used.setText("사용중 " + getFileSize(exStUsedMemory));
-        tv_available.setText("사용 가능 " + getFileSize(exStAvailableMemory));
 
-        Button btn = findViewById(R.id.btn_go_to_2);
-        btn.setOnClickListener(new View.OnClickListener() {
+
+        btn_no_url = findViewById(R.id.btn_no_url);
+        btn_no_url.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MediaInfoActivity2.class);
-                intent.putExtra("all", exStAllMemory);
-                startActivity(intent);
+                // 알림 전송
+                createNotification("TEST", 1, "url 없는 노티", "안녕하세요");
             }
         });
 
-    }
-
-    public String getFileSize(long size) {
-        if (size <= 0)
-            return "0";
-        final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
-        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
-    }
-
-    private boolean isExternalMemoryAvailable(){
-        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
-    }
-
-    private void checkExternalStorageAllMemory() {
-        if(isExternalMemoryAvailable() == true){
-            StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
-            long blockSize = stat.getBlockSizeLong();
-            long totalBlocks = stat.getBlockCountLong();
-
-            exStAllMemory = totalBlocks * blockSize;
-        }
-    }
-
-    private void checkExternalAvailableMemory() {
-        if(isExternalMemoryAvailable() == true){
-            File file = Environment.getExternalStorageDirectory();
-            StatFs stat = new StatFs(file.getPath());
-            long blockSize = stat.getBlockSizeLong();
-            long availableBlocks = stat.getAvailableBlocksLong();
-
-            exStAvailableMemory = availableBlocks * blockSize;
-        }
-    }
-
-    private void checkExternalUsedMemory(long exStAllMemory) {
-        if(isExternalMemoryAvailable() == true){
-            File file = Environment.getExternalStorageDirectory();
-            StatFs stat = new StatFs(file.getPath());
-            long blockSize = stat.getBlockSizeLong();
-            long availableBlocks = stat.getAvailableBlocksLong();
-
-            exStUsedMemory = exStAllMemory - (availableBlocks * blockSize);
-        }
-    }
-
-    // 권한 체크
-    private void permissionCheck(){
-        // sdk 23버전 이하 버전에서는 permission이 필요하지 않음
-        if(Build.VERSION.SDK_INT >= 23){
-
-            // 클래스 객체 생성
-            permission =  new PermissionSupport(this, this);
-
-            // 권한 체크한 후에 리턴이 false일 경우 권한 요청을 해준다.
-            if(!permission.checkPermission()){
-                permission.requestPermission();
+        btn_yes_url = findViewById(R.id.btn_yes_url);
+        btn_yes_url.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 알림 전송
+                createNotification("TEST", 1, "url 있는 노티", "여기 접속하세요." + url);
             }
+        });
+    }
+
+    void createNotification(String channelId, int id, String title, String text)
+    {
+        Intent intent = new Intent(this, MainActivity.class);       // 클릭시 실행할 activity를 지정
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setAutoCancel(true)                // true이면 클릭시 알림이 삭제된다
+                .setContentIntent(pendingIntent)    // 클릭시 설정된 PendingIntent가 실행된다
+                //.setTimeoutAfter(1000)
+                //.setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+
+        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(id, builder.build());
+    }
+
+    void destroyNotification(int id)
+    {
+        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(id);
+    }
+
+    // 노티 채널 생성
+    void createNotificationChannel(String channelId, String channelName, int importance)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(new NotificationChannel(channelId, channelName, importance));
         }
     }
 
-    // Request Permission에 대한 결과 값을 받는다.
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    // 받아온 정보를 바탕으로 팝업창 표시
+    static void showDialog(String title, String text, String subText, String time) {
+        Dialog dl = new Dialog(context);
+        dl.setContentView(R.layout.dailog_noti_posted);
+        dl.show();
 
-        // 리턴이 false일 경우 다시 권한 요청
-        if (!permission.permissionResult(requestCode, permissions, grantResults)){
-            permission.requestPermission();
-        }
+        TextView tv_title = dl.findViewById(R.id.tv_title);
+        tv_title.setText(title);
+
+        TextView tv_text = dl.findViewById(R.id.tv_text);
+        tv_text.setText(text);
+
+        TextView tv_text_sub = dl.findViewById(R.id.tv_text_sub);
+        tv_text_sub.setText(subText);
+
+        TextView tv_time = dl.findViewById(R.id.tv_time);
+        tv_time.setText(time);
+
     }
 
+    // 권환 취득여부 확인
+    private boolean permissionGrantred() {
+        Set<String> sets = NotificationManagerCompat.getEnabledListenerPackages(this);
+        if (sets != null && sets.contains(getPackageName())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }
