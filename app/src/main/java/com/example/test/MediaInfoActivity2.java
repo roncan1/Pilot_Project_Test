@@ -13,15 +13,20 @@ import android.app.Activity;
 import android.app.AppOpsManager;
 import android.app.usage.StorageStats;
 import android.app.usage.StorageStatsManager;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.os.Process;
 import android.os.UserHandle;
 import android.provider.MediaStore;
@@ -31,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -104,6 +110,7 @@ public class MediaInfoActivity2 extends AppCompatActivity {
                 MediaStore.Images.Media.DISPLAY_NAME, // 파일 이름
                 MediaStore.Images.Media.DATE_MODIFIED, // 수정된 날짜
                 MediaStore.Images.Media.SIZE, // 파일 크기
+                MediaStore.Images.Media._ID // 파일 id (미디어 열떄 필요)
         };
 
         // 파일목록 쿼리 (3,4,5번 인자값을 null로 설정해 모든 이미지파일을 받아옴)
@@ -116,15 +123,19 @@ public class MediaInfoActivity2 extends AppCompatActivity {
         );
 
         // 원하는 데이터가 저장된 column값을 받아옴
-        int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE);
-        int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME);
-        int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED);
+        int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
+        int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+        int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED);
+        int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+
+        long id = 0;
 
         // 모든 이미지 파일을 하나씩 탐색하며 원하는 동작을 처리
         while (cursor.moveToNext()) {
             int size = cursor.getInt(sizeColumn);
             String name = cursor.getString(nameColumn);
             String date = cursor.getString(dateColumn);
+            id = cursor.getLong(idColumn);
             bytes += size;
             imgCount++;
         }
@@ -132,9 +143,30 @@ public class MediaInfoActivity2 extends AppCompatActivity {
         // 퍼센트 확인을 위한 임시코드
         image = bytes;
 
-        // 모든 이미지의 크기가 더해진 byte 값을 리턴
+        // 미디어 저장소가 이전과 변동이 있는지 체크 (정확히는 현재 상태코드를 가져옴 비교하는 코드 추가 필요)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Log.d("TAG", "변동사항: " + MediaStore.getGeneration(getApplicationContext(), MediaStore.VOLUME_EXTERNAL));
+        }
+
+        // id 이용해서 이미지뷰에 세팅
+        ContentResolver resolver = getApplicationContext().getContentResolver();
+        String readOnlyMode = "r";
+        Uri contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+        try (ParcelFileDescriptor pfd = resolver.openFileDescriptor(contentUri, readOnlyMode)) {
+            // Perform operations on "pfd".
+            FileDescriptor fileDescriptor = pfd.getFileDescriptor();
+            Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+            pfd.close();
+            ImageView iv = findViewById(R.id.iv_test);
+            iv.setImageBitmap(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         return bytes;
     }
+    // 모든 이미지의 크기가 더해진 byte 값을 리턴
 
     // 단위 변환
     public String unitConversion(long size) {
@@ -152,6 +184,7 @@ public class MediaInfoActivity2 extends AppCompatActivity {
 //
 //
 //
+    
 
     public static boolean needPermissionForBlocking(Context context) {
         try {
